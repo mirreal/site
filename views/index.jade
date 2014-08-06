@@ -1,0 +1,11 @@
+extends layout
+block body
+  div(class="jumbotron")
+    if (authenticated)
+      p Wlecome back, #{me.fisrt} #{me.last}.
+      a(href="/logout") Logout
+    else
+      h2 Wlecome new vistor!
+      ul
+        li: a(href="/login") Login
+        li: a(href="/signup") Signup

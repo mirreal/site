@@ -1,0 +1,8 @@
+extends layout
+block body
+  h2 To Do Lists
+  input(type="text", id="input", placeholder="Please input..")
+  button(id="send") Submit
+  ol(id="to_do_lists")
+  script(src="/socket.io/socket.io.js")
+  script(src="/javascripts/lists.js")
