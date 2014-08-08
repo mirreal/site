@@ -3,6 +3,8 @@ block body
   div(class="jumbotron")
     if (authenticated)
       p Wlecome back, #{me.fisrt} #{me.last}.
+      h2
+        a(href="/weibo") Go To WEIBO
       a(href="/logout") Logout
     else
       h2 Wlecome new vistor!

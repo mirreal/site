@@ -1,0 +1,8 @@
+extends layout
+block body
+  fieldset
+    h2= user.name
+    p: a(id="follow", href="#") Follow
+    p= user.first
+  script(src="../javascripts/socket.io.min.js")
+  script(src="../javascripts/user.js")

@@ -47,6 +47,13 @@ app.get('/login', function(req, res) {
 app.get('/signup', function(req, res) {
   res.render('signup');
 });
+app.get('/user/:name', function(req, res) {
+  app.users.findOne({ name: req.params.name }, function(err, doc) {
+    if (err) return next(err);
+    if (!doc) return res.send(404);
+    res.render('user', { user: doc });
+  });
+});
 
 app.post('/signup', function(req, res, next) {
   app.users.insert(req.body.user, function(err, doc) {
@@ -88,12 +95,14 @@ app.get('/post/:postTitle', function(req, res) {
 
 var mongodb = require('mongodb');
 var dbServer = new mongodb.Server('127.0.0.1', 27017);
+//var dbServer = new mongodb.Server('192.168.229.1', 27017);
 new mongodb.Db('mysite', dbServer).open(function(err, client) {
   if (err) throw err;
   console.log('connet to mongodb.');
   app.users = new mongodb.Collection(client, 'users');
   app.posts = new mongodb.Collection(client, 'posts');
   app.lists = new mongodb.Collection(client, 'lists');
+  app.weibo = new mongodb.Collection(client, 'weibo');
   client.ensureIndex('users', 'email', function(err) {
     if (err) throw err;
     client.ensureIndex('users', 'password', function(err) {
@@ -114,7 +123,7 @@ var io = require('socket.io').listen(server);
 io.of('/lists').on('connection', function(socket) {
   socket.on('online', function() {
     app.lists.find().toArray(function(err, doc) {
-      if (err) return err;
+      if (err) return next(err);
       var data = [];
       for (var i = 0; i < doc.length; i++) {
         data[i] = doc[i].data;
@@ -135,4 +144,61 @@ io.of('/lists').on('connection', function(socket) {
       if (err) return next(err);
     });
   });
+});
+
+app.get('/weibo', function(req, res) {
+  res.render('weibo');
+});
+io.of('/weibo').on('connection', function(socket) {
+  socket.on('online', function(data) {
+    var followed = [];
+    var weibo = [];
+    app.users.findOne({ name: data}, function(err, doc) {
+      if (err) return next(err);
+      if (!doc) return;
+      followed = doc.followed;
+      if (followed) {
+        followed.forEach(function(item) {
+          app.weibo.find({ user: item }).toArray(function(err, doc) {
+            if (err) return next(err);
+            if (doc) weibo = weibo.concat(doc);
+          });
+        });
+      }
+      app.weibo.find({ user: data }).toArray(function(err, doc) {
+        if (err) return next(err);
+        if (doc) weibo = weibo.concat(doc);
+        console.log(weibo);
+        socket.emit('online', weibo);
+      });
+      //socket.emit('online', weibo);
+    });
+  });
+  socket.on('add', function(data) {
+    app.weibo.insert(data, function(err, doc) {
+      if (err) return next(err);
+    });
+  });
+});
+
+io.of('/user').on('connection', function(socket) {
+  console.log('connected.');
+  socket.on('follow', function(data) {
+    app.users.findOne({ name: data.follower }, function(err, doc) {
+      if (err) return next(err);
+      if (!doc) return;
+      app.users.remove(doc);
+      if (data.follow == 1) {
+        if (!doc.followed) doc.followed = [];
+        if (doc.followed.indexOf(data.followed) == -1) doc.followed.push(data.followed);
+      } else {
+        var index = doc.followed.indexOf(data.followed);
+        doc.followed.splice(index, 1);
+      }
+      app.users.insert(doc, function(err, doc) {
+        if (err) return next(err);
+      });
+    });
+  });
+
 });

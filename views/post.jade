@@ -1,0 +1,16 @@
+extends layout
+block body
+  form(id="post", action="/post", method="POST")
+    fieldset
+      legend Write a Post
+      p
+        label Title
+        input(name="post[title]", type="text")
+      p Content
+      p
+        textarea(name="post[content]", rows="12", cols="36")
+      p
+        label Date
+        input(name="post[date]", type="date")
+      p
+        button(type="submit") Submit

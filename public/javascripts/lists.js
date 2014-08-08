@@ -18,7 +18,7 @@ var sendBtn = document.getElementById('send');
 sendBtn.onclick = addList;
 document.addEventListener('keydown', function(event) {
   if (event.keyCode == 13) addList();
-});
+}, false);
 
 function addList() {
   var value= input.value;

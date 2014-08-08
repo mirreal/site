@@ -1,0 +1,22 @@
+extends layout
+block body
+  form()
+    fieldset
+      legend My Weibo
+      p
+        textarea(id="input", placeholder="Write something...")
+      p
+        input(id="send", type="button", value="Send")
+        input(type="button", value="Option")
+  div
+    nav
+      ul
+        li All
+        li Friends
+        li Group
+        li Collection
+    p Order in time.
+    fieldset
+      ul(id="weiboLists")
+    script(src="socket.io/socket.io.js")
+    script(src="javascripts/weibo.js")
