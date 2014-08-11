@@ -1,7 +1,10 @@
 var express = require('express');
-var routes = require('./routes');
 var http = require('http');
 var path = require('path');
+var db = require('./modules/database');
+var user = require('./modules/user');
+//var list = require('./modules/list');
+//var weibo = require('./modules/weibo');
 
 var app = express();
 var server = http.createServer(app);
@@ -18,8 +21,7 @@ app.use(express.session({ secret: 'nodeisfire' }));
 app.use(function(req, res, next) {
   if (req.session.loggedIn) {
     res.locals.authenticated = true;
-    app.users.findOne({ email: req.session.loggedIn }, function(err, doc) {
-      if (!doc) console.log('Not found.');
+    db.users.findOne({ email: req.session.loggedIn }, function(err, doc) {
       if (err) return next(err);
       res.locals({ 'me': doc });
       next();
@@ -47,25 +49,31 @@ app.get('/login', function(req, res) {
 app.get('/signup', function(req, res) {
   res.render('signup');
 });
-app.get('/user/:name', function(req, res) {
-  app.users.findOne({ name: req.params.name }, function(err, doc) {
-    if (err) return next(err);
-    if (!doc) return res.send(404);
-    res.render('user', { user: doc });
-  });
-});
-
 app.post('/signup', function(req, res, next) {
-  app.users.insert(req.body.user, function(err, doc) {
+  db.users.findOne({name: req.body.user.name}, function(err, doc) {
     if (err) return next(err);
-    res.redirect('/login/' + doc[0].email);
+    if (doc) {
+      return res.render('signup', {info: 'Usename already exist...'});
+    } else {
+      db.users.findOne({email: req.body.user.email}, function(err, doc) {
+        if (err) return next(err);
+        if (doc) {
+          return res.render('signup', {info: 'Email already exist...'});
+        } else {
+          db.users.insert(req.body.user, function(err, doc) {
+            if (err) return next(err);
+            res.redirect('/login/' + doc[0].email);
+          });
+        }
+      });
+    }
   });
 });
 app.get('/login/:signupEmail', function(req, res) {
   res.render('login', { signupEmail: req.params.signupEmail });
 });
 app.post('/login', function(req, res) {
-  app.users.findOne({ email: req.body.user.email, password: req.body.user.password }, function(err, doc) {
+  db.users.findOne({ email: req.body.user.email, password: req.body.user.password }, function(err, doc) {
     if (err) return next(err);
     if (!doc) return res.send('<p>User not found. <a href=\"/\">Go back</a> and try again.</p>');
     req.session.loggedIn = doc.email.toString();
@@ -76,6 +84,14 @@ app.get('/logout', function(req, res) {
   req.session.loggedIn = null;
   res.redirect('/');
 });
+app.get('/user/:name', function(req, res) {
+  db.users.findOne({ name: req.params.name }, function(err, doc) {
+    if (err) return next(err);
+    if (!doc) return res.send(404);
+    res.render('user', { user: doc });
+  });
+});
+
 app.get('/post', function(req, res) {
   res.render('post');
 });
@@ -85,120 +101,26 @@ app.post('/post', function(req, res) {
     res.redirect('/post/' + doc[0].title);
   });
 });
-app.get('/post/:postTitle', function(req, res) {
-  app.posts.findOne({ title: req.params.postTitle }, function(err, doc) {
+app.get('/post/:title', function(req, res) {
+  app.posts.findOne({ title: req.params.title }, function(err, doc) {
     if (err) return next(err);
     if (!doc) return res.send('<h2>error 404</h2><p>Page not Found</p>');
     res.render('showPost', { post: doc });
   });
 });
-
-var mongodb = require('mongodb');
-var dbServer = new mongodb.Server('127.0.0.1', 27017);
-//var dbServer = new mongodb.Server('192.168.229.1', 27017);
-new mongodb.Db('mysite', dbServer).open(function(err, client) {
-  if (err) throw err;
-  console.log('connet to mongodb.');
-  app.users = new mongodb.Collection(client, 'users');
-  app.posts = new mongodb.Collection(client, 'posts');
-  app.lists = new mongodb.Collection(client, 'lists');
-  app.weibo = new mongodb.Collection(client, 'weibo');
-  client.ensureIndex('users', 'email', function(err) {
-    if (err) throw err;
-    client.ensureIndex('users', 'password', function(err) {
-      if (err) throw err;
-      console.log('Ensure index.');
-      server.listen(app.get('port'), function(){
-        console.log('Express server listening on port ' + app.get('port'));
-      });
-    });
-  });
-});
-
 app.get('/lists', function(req, res) {
   res.render('lists');
 });
-
-var io = require('socket.io').listen(server);
-io.of('/lists').on('connection', function(socket) {
-  socket.on('online', function() {
-    app.lists.find().toArray(function(err, doc) {
-      if (err) return next(err);
-      var data = [];
-      for (var i = 0; i < doc.length; i++) {
-        data[i] = doc[i].data;
-      }
-      socket.emit('online', data);
-    });
-  });
-  socket.on('addList', function(data) {
-    socket.broadcast.emit('addList', data);
-    var list = { data: data };
-    app.lists.insert(list, function(err, doc) {
-      if (err) return next(err);
-    });
-  });
-  socket.on('del', function(data) {
-    socket.broadcast.emit('del', data);
-    app.lists.remove({ data: data}, function(err, doc) {
-      if (err) return next(err);
-    });
-  });
-});
-
 app.get('/weibo', function(req, res) {
   res.render('weibo');
 });
-io.of('/weibo').on('connection', function(socket) {
-  socket.on('online', function(data) {
-    var followed = [];
-    var weibo = [];
-    app.users.findOne({ name: data}, function(err, doc) {
-      if (err) return next(err);
-      if (!doc) return;
-      followed = doc.followed;
-      if (followed) {
-        followed.forEach(function(item) {
-          app.weibo.find({ user: item }).toArray(function(err, doc) {
-            if (err) return next(err);
-            if (doc) weibo = weibo.concat(doc);
-          });
-        });
-      }
-      app.weibo.find({ user: data }).toArray(function(err, doc) {
-        if (err) return next(err);
-        if (doc) weibo = weibo.concat(doc);
-        console.log(weibo);
-        socket.emit('online', weibo);
-      });
-      //socket.emit('online', weibo);
-    });
-  });
-  socket.on('add', function(data) {
-    app.weibo.insert(data, function(err, doc) {
-      if (err) return next(err);
-    });
-  });
-});
 
-io.of('/user').on('connection', function(socket) {
-  console.log('connected.');
-  socket.on('follow', function(data) {
-    app.users.findOne({ name: data.follower }, function(err, doc) {
-      if (err) return next(err);
-      if (!doc) return;
-      app.users.remove(doc);
-      if (data.follow == 1) {
-        if (!doc.followed) doc.followed = [];
-        if (doc.followed.indexOf(data.followed) == -1) doc.followed.push(data.followed);
-      } else {
-        var index = doc.followed.indexOf(data.followed);
-        doc.followed.splice(index, 1);
-      }
-      app.users.insert(doc, function(err, doc) {
-        if (err) return next(err);
-      });
-    });
-  });
+var io = require('socket.io').listen(server);
+var socketio = require('./socketio');
+socketio.list(io, db);
+socketio.weibo(io, db);
+socketio.user(io, db);
 
+server.listen(app.get('port'), function(){
+  console.log('Express server listening on port ' + app.get('port'));
 });

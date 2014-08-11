@@ -1,6 +1,6 @@
 extends layout
 block body
-  form()
+  form
     fieldset
       legend My Weibo
       p
@@ -8,6 +8,8 @@ block body
       p
         input(id="send", type="button", value="Send")
         input(type="button", value="Option")
+        span(id="word") 140
+        words  words left.
   div
     nav
       ul

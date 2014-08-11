@@ -1,6 +1,6 @@
 extends layout
 block body
-  form(action="/signup", method="POST")
+  form(id="signup", action="/signup", method="POST")
     fieldset
       legend Sign up
       p
@@ -13,12 +13,17 @@ block body
         label Password
         input(name="user[password]", type="password")
       p
+        label Password Repeat
+        input(name="user[password-repeat]", type="password")
+      p
         label First
         input(name="user[first]", type="text")
       p
         label Last
         input(name="user[last]", type="text")
       p
-        button Submit
+        input(type="submit") Submit
       p
         a(href="/") Go Back
+  h2= info
+  script(src="javascripts/signup.js")

@@ -3,6 +3,9 @@ block body
   fieldset
     h2= user.name
     p: a(id="follow", href="#") Follow
-    p= user.first
+    fieldset
+      legend Profile
+      p= user.first
+      p email:  #{user.email}
   script(src="../javascripts/socket.io.min.js")
   script(src="../javascripts/user.js")
