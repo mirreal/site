@@ -11,6 +11,7 @@ db.open(function(err, client) {
   db.posts = new mongodb.Collection(client, 'posts');
   db.lists = new mongodb.Collection(client, 'lists');
   db.weibo = new mongodb.Collection(client, 'weibo');
+  db.projects = new mongodb.Collection(client, 'projects');
 });
 
 module.exports = db;

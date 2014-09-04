@@ -3,8 +3,6 @@ var http = require('http');
 var path = require('path');
 var db = require('./modules/database');
 var user = require('./modules/user');
-//var list = require('./modules/list');
-//var weibo = require('./modules/weibo');
 
 var app = express();
 var server = http.createServer(app);
@@ -21,7 +19,7 @@ app.use(express.session({ secret: 'nodeisfire' }));
 app.use(function(req, res, next) {
   if (req.session.loggedIn) {
     res.locals.authenticated = true;
-    db.users.findOne({ email: req.session.loggedIn }, function(err, doc) {
+    db.users.findOne({ name: req.session.loggedIn }, function(err, doc) {
       if (err) return next(err);
       res.locals({ 'me': doc });
       next();
@@ -85,10 +83,16 @@ app.get('/logout', function(req, res) {
   res.redirect('/');
 });
 app.get('/user/:name', function(req, res) {
-  db.users.findOne({ name: req.params.name }, function(err, doc) {
+  var followe;
+  db.users.findOne({ email: req.session.loggedIn }, function(err, doc) {
     if (err) return next(err);
-    if (!doc) return res.send(404);
-    res.render('user', { user: doc });
+    if (doc.followed.indexOf(req.params.name) != -1) follow = 'Followed';
+    else follow = 'Follow';
+    db.users.findOne({ name: req.params.name }, function(err, doc) {
+      if (err) return next(err);
+      if (!doc) return res.send(404);
+      res.render('user', { user: doc, follow: follow });
+    });
   });
 });
 
@@ -114,6 +118,66 @@ app.get('/lists', function(req, res) {
 app.get('/weibo', function(req, res) {
   res.render('weibo');
 });
+app.get('/weibo/comment:id', function(req, res, next) {
+  console.log(req.params.id);
+  db.weibo.findOne({date: parseInt(req.params.id)}, function(err, doc) {
+    if (err) return next(err);
+    res.render('comment', {weibo: doc});
+  });
+});
+
+
+app.get('/list', function(req, res) {
+  res.render('list');
+});
+app.get('/list/login', function(req, res) {
+  res.render('login_list');
+});
+app.get('/list/signup', function(req, res) {
+  res.render('signup_list');
+});
+
+app.post('/list/signup', function(req, res, next) {
+  db.users.findOne({name: req.body.user.name}, function(err, doc) {
+    if (err) return next(err);
+    if (doc) {
+      res.render('signup_list', {info: 'Username already exist...'});
+    } else {
+      var user = req.body.user;
+      user.currentProject = {name: 'default', author: user.name};
+      user.projects = [user.currentProject];
+      var project = {
+        name: 'default',
+        author: user.name,
+        owner: [user.name]
+      };
+      db.projects.insert(project, function(err, doc) {
+        if (err) return nect(err);
+        db.users.insert(user, function(err, doc) {
+          if (err) return next(err);
+          res.redirect('/list/login/' + doc[0].name);
+        });
+      });
+    }
+  });
+})
+app.get('/list/login/:signupName', function(req, res) {
+  res.render('login_list', {signupName: req.params.signupName});
+});
+app.post('/list/login', function(req, res, next) {
+  db.users.findOne({name: req.body.user.name, password: req.body.user.password}, function(err, doc) {
+    if (err) return next(err);
+    if (!doc) return res.send('<p>User not found. <a href=\"/\">Go back</a> and try again.</p>');
+    req.session.loggedIn = doc.name.toString();
+    res.redirect('/list');
+  });
+});
+app.get('/list/logout', function(req, res) {
+  req.session.loggedIn = null;
+  res.redirect('/list');
+});
+
+
 
 var io = require('socket.io').listen(server);
 var socketio = require('./socketio');

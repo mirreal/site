@@ -1,25 +1,64 @@
 exports.list = function(io, db) {
-  io.of('/lists').on('connection', function(socket) {
-    socket.on('online', function() {
-      db.lists.find().toArray(function(err, doc) {
+  io.on('connection', function(socket) {
+    socket.on('online', function(data) {
+      socket.name = data.user;
+
+      db.projects.findOne(data, function(err, doc) {
         if (err) return next(err);
-        var data = [];
-        for (var i = 0; i < doc.length; i++) {
-          data[i] = doc[i].data;
+        console.log(doc);
+        socket.emit('owner', doc.owner)
+        if (doc) {
+          var own = {
+            author: doc.author,
+            project: doc.name
+          };
         }
-        socket.emit('online', data);
+        db.lists.find({own: own}).toArray(function(err, doc) {
+          if (err) return next(err);
+          socket.emit('online', doc);
+        });
       });
     });
     socket.on('addList', function(data) {
-      socket.broadcast.emit('addList', data);
-      var list = { data: data };
-      db.lists.insert(list, function(err, doc) {
+      db.projects.findOne(data.own, function(err, doc) {
+        if (err) return next(err);
+        if (doc) {
+          var own = {
+            author: doc.author,
+            project: doc.name
+          };
+        }
+        var list = data.list;
+        list.own = own;
+        socket.broadcast.emit('addList', {list: list, project: doc});
+        db.lists.insert(list, function(err, doc) {
+          if (err) return next(err);
+        });
+      });
+    });
+    socket.on('delete', function(data) {
+      socket.broadcast.emit('delete', data);
+      var date = parseInt(data);
+      db.lists.remove({date: date}, function(err, doc) {
         if (err) return next(err);
       });
     });
-    socket.on('del', function(data) {
-      socket.broadcast.emit('del', data);
-      db.lists.remove({ data: data }, function(err, doc) {
+    socket.on('done', function(data) {
+      socket.broadcast.emit('done', data);
+      var date = parseInt(data);
+      db.lists.update({date: date}, {$set: {done: true}}, function(err, doc) {
+        if (err) return next(err);
+      });
+    });
+    socket.on('color', function(data) {
+      socket.broadcast.emit('color', data);
+      var date = parseInt(data.key);
+      db.lists.update({date: date}, {$set: {color: data.color}}, function(err, doc) {
+        if (err) return next(err);
+      });
+    });
+    socket.on('addUser', function(data) {
+      db.projects.update(data.own, {$push: {owner: data.name}}, function(err, doc) {
         if (err) return next(err);
       });
     });
@@ -100,10 +139,16 @@ exports.weibo = function(io, db) {
         user: data.weibo.user,
         date: data.weibo.date
       }
-      db.weibo.update(weibo, {$set: {favour: data.user}}, {safe: true},
-          function(err) {
+      db.weibo.findOne(weibo, {safe: true}, function(err, doc) {
         if (err) return next(err);
-        console.log('update success...');
+        var favour = doc.favour;
+        if (typeof(favour) != 'number') favour = 1;
+        else favour += 1;
+        db.weibo.update(weibo, {$set: {favour: favour}}, {safe: true},
+            function(err) {
+          if (err) return next(err);
+          console.log('update success...');
+        });
       });
     });
 

@@ -1,26 +1,72 @@
-doctype 5
+doctype html
 html
   head
-    title Mirreal's Notes
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    meta(charset="utf-8")
+    title Mirreal's Note
+    link(rel="icon", href="images/favicon.ico")
+    link(rel="stylesheet", href="stylesheets/main.css")
   body
-    h1 Welcome to Mirreal's Notes
-    hr
-    ul
-      li: a(href="/") Home
-      li: a(href="/weibo") Weibo
-      li: a(href="/lists") TODOLISTS
-      li: a(href="/post") Write a Post
-    ul
-    if (authenticated)
-      li
-        a(href="/user/#{me.name}") #{me.name}
-      li
-        a(href="/logout") Logout
-    else
-      li: a(href="/login") Login
-      li: a(href="/signup") Sign up
-    block body
-    hr
-    footer
-     p Copyright Mirreal's Notes 2014
+header
+  .box
+    .box1
+    .box2
+    .box3
+    .box4
+    .box5
+    .box6
+    .box7
+  #menu
+    #logo
+      a(href='/', alt='HOME')
+        img(src='images/logo_256.png', height='64')
+    nav
+      ul
+        li
+          a(href='/') Home
+        li
+          a(href='http://blog.mirreal.net', target='_blank') Blog
+        li
+          a(href='/') Project
+        li
+          a(href='/') About
+        li
+          a(href='/') Contact
+        li
+          a(href='/') Surprise
+  .cleaner
+
+block body
+
+#footer_wrapper
+  #footer
+    .section_w500
+      h4 About me
+      p 秘锐笔记
+      p
+        | 我，大学四年级学生，热爱互联网，喜欢Web技术，像许多程序员一样，相信技术可以改变世界.点击查看
+        a(href='resume.pdf') 我的简历
+        | ，如果觉得还靠谱，请内推。
+    .section_w100
+      h4 Links
+      ul.footer_list_menu
+        li
+          a(href='/list', target='_blank') Multi-Todolist
+        li
+          a(href='/tower-of-hanoi', target='_blank') Tower of Hanoi
+        li
+          a(href='/game-of-life', target='_blank') Game of Life
+        li
+          a(href='/weibo', target='_blank') weibo(development version)
+    .section_w200
+      .section_douban_weibo.weibo
+        a(href='http://weibo.com/taocid', target='_blank')
+          | FOLLOW ME
+          span on Weibo
+      .margin_bottom_20
+      .section_douban_weibo.douban
+        a(href='http://www.douban.com/people/zgkmranyu', target='_blank')
+          | FOLLOW ME
+          span on Douban
+    .cleaner
+  .cleaner
+  footer Copyright © 2014. Mirreal Ellison. All rights reserved.

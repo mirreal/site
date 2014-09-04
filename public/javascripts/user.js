@@ -3,8 +3,9 @@ var socket = io.connect('/user');
 var follow = document.getElementById('follow');
 follow.onclick = function(event) {
   event.preventDefault();
-  var follower = document.getElementsByTagName('h2')[0].innerHTML;
-  var followed = document.getElementsByTagName('a')[2].innerHTML;
+  var followed = document.getElementsByTagName('h2')[0].innerHTML;
+  var follower = document.getElementsByTagName('a')[4].innerHTML;
+  if (followed == follower) return alert('You can not follow youself.');
   console.log(follower + ' follow ' + followed);
   if (follow.innerHTML == 'Follow') {
     socket.emit('follow', {

@@ -2,10 +2,18 @@ extends layout
 block body
   fieldset
     h2= user.name
-    p: a(id="follow", href="#") Follow
+    p: a(id="follow", href="#") #{follow}
     fieldset
       legend Profile
-      p= user.first
-      p email:  #{user.email}
+      p Nick Name: #{user.name}
+      p Real Name: #{user.first} #{user.last}
+      p Email:  #{user.email}
+      p Telephone:
+      p City:
+      p Birthday:
+      p Interest:
+      p Hobits:
+      p Website:
+      p Tags:
   script(src="../javascripts/socket.io.min.js")
   script(src="../javascripts/user.js")

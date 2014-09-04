@@ -1,21 +1,41 @@
-var socket = io.connect('/lists');
-socket.emit('online');
+var userElement = document.getElementById('user');
+var projectElement = document.getElementById('project');
+var user = userElement ? userElement.innerHTML : 'all';
+var project = projectElement ? projectElement.innerHTML: 'all';
+var own = {owner: user, name: project};
+
+
+var socket = io.connect();
+socket.emit('online', own);
+
 socket.on('online', function(data) {
-  for (var i = 0; i < data.length; i++) {
-    addListToDOM(data[i]);
+  data.forEach(function(list) {
+    addListToDOM(list);
+  });
+});
+
+socket.on('owner', function(data) {
+  data.forEach(function(owner) {
+    addOwerTODOM(owner);
+  });
+});
+
+socket.on('addList', function(data) {
+  if (data.project.name == project && data.project.owner.indexOf(user) != -1) {
+    addListToDOM(data.list);
   }
 });
-socket.on('addList', function(data) {
-  addListToDOM(data);
-});
+
 socket.on('delete', function(data) {
   removeListFromDOM(data);
 });
+
 socket.on('done', function(data) {
   var list = document.getElementById(data);
   list.style.background = 'url(images/done.png) center no-repeat';
   list.style.color = '#aaa';
 });
+
 socket.on('color', function(data) {
   var list = document.getElementById(data.key);
   list.style.background = colors[data.color];
@@ -24,10 +44,22 @@ socket.on('color', function(data) {
 
 var colors = ['pink', 'palegreen', 'lightblue', '#FC9', '#C03',
     'yellow', 'orange', 'brown', 'Magenta', 'DeepSkyBlue', 'DarkKhaki']
-var lists = document.getElementById('todolists');
-var input = document.getElementById('input');
-var sendBtn = document.getElementById('send');
-sendBtn.onclick = addList;
+
+var owners = document.getElementById('owners'),
+    addUserButton = document.getElementById('addUserButton'),
+    lists = document.getElementById('todolists'),
+    input = document.getElementById('input');
+
+if (addUserButton) {
+  addUserButton.onclick = function(event) {
+    var addUsername = document.getElementById('addUser').value;
+    socket.emit('addUser', {name: addUsername, own: own});
+    alert('Add success...');
+    document.getElementById('addUser').value = '';
+  };
+}
+
+
 document.addEventListener('keydown', function(event) {
   if (event.keyCode == 13) addList();
 }, false);
@@ -35,20 +67,20 @@ document.addEventListener('keydown', function(event) {
 function addList() {
   var value= input.value;
   if (!value) value = ' ';
-  var color = parseInt(Math.random() * 5 - 0.2);
+  var color = parseInt(Math.random() * 11 - 0.2);
 
   var list = {
     content: value,
     done: false,
     color: color,
-    date: Date.now()
+    date: Date.now(),
   };
 
   addListToDOM(list);
-  socket.emit('addList', list);
+  socket.emit('addList', {list: list, own: own});
   input.value = '';
   input.focus();
-};
+}
 
 function addListToDOM(list) {
   var li = document.createElement('li');
@@ -97,6 +129,12 @@ function clickEventHandle(event) {
     li.style.background = colors[color];
     socket.emit('color', {key: key, color: color});
   }
+}
+
+function addOwerTODOM(owner) {
+  var li = document.createElement('li');
+  li.innerHTML = owner;
+  if (owners) owners.appendChild(li);
 }
 
 function removeListFromDOM(key) {

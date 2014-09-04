@@ -1,0 +1,17 @@
+extends layout_list
+block body
+  if (signupName)
+    p Congratuations on sign up! Please login below
+  form(action="/list/login", method="POST")
+    fieldset
+      legend Log in
+      p
+        label Username
+        input(name="user[name]", type="text", value=signupName, required)
+      p
+        label Password
+        input(name="user[password]", type="password", required)
+      p
+        button Submit
+      p  
+        a(href="/list") Go Back

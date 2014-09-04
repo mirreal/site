@@ -1,0 +1,26 @@
+doctype 5
+html
+  head
+    title Mirreal's Notes
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    h1 Welcome to Mirreal's Notes
+    hr
+    ul
+      li: a(href="/") Home
+      li: a(href="/weibo") Weibo
+      li: a(href="/list") TODOLISTS
+      li: a(href="/post") Write a Post
+    ul
+    if (authenticated)
+      li
+        a(href="/user/#{me.name}") #{me.name}
+      li
+        a(href="/logout") Logout
+    else
+      li: a(href="/login") Login
+      li: a(href="/signup") Sign up
+    block body
+    hr
+    footer
+     p Copyright Mirreal's Notes 2014

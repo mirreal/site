@@ -1,13 +1,42 @@
 extends layout
 block body
-  div(class="jumbotron")
-    if (authenticated)
-      p Wlecome back, #{me.fisrt} #{me.last}.
-      h2
-        a(href="/weibo") Go To WEIBO
-      a(href="/logout") Logout
-    else
-      h2 Wlecome new vistor!
-      ul
-        li: a(href="/login") Login
-        li: a(href="/signup") Signup
+
+  #content_wrapper
+    #content
+      #project
+        #slideshow
+          #slidesContainer
+            .slide
+              a(href='http://sandbox.runjs.cn/show/mze7osr0', target='_blank')
+                img(src='images/fling_snapshot.png', alt='Fling in Canvas', width='380', height='190')
+                h2 Fling in Canvas
+                p 一个趣味十足的游戏。玩家需要控制移动一个小球去撞击其他球，当只剩下一个小球时，恭喜你已经解开这个puzzle。目前有数十个难度各异的关卡，当完成所有关卡，还会看到一个简单的高分排行榜。
+            .slide
+              a(href='/list', target='_blank')
+                img(src='images/todolist_snapshot.png', alt='Multi-Todolist', width='380', height='190')
+                h2 Multi-Todolist
+                p 一个多人协作式便签应用。想法来源于管理人员使用便签这种简单原始的办法分配任务。最初进入应用时看到的是公开便签墙。用户创建账号后会拥有私有的Project，可以自己写便签，可以邀请朋友加入Project。
+            .slide
+              a(href='/', target='_blank')
+                img(src='images/draw-somthing.png', alt='Draw Something', width='380', height='190')
+                h2 Draw Something
+                p 你画我猜模式的简单复刻版。Server端使用Express和Socket.io实现，前端画板使用HTML5Canvas实现，通过WebSocket实时传输数据。
+      #bubbles
+        .bubble.x1
+        .bubble.x2
+        .bubble.x3
+        .bubble.x4
+        .bubble.x5
+      section
+        #welcome
+          #thoreau
+            p I went to the woods becanse I wanted to live deliberately
+            p I wanted to live deep and suck out of all the marrow of life
+            p To put to rout all that was not life
+            p And not when I came to die, discove that I had not lived.
+            p ———— Henry David Throeau
+            p
+        canvas#canvas(width='740,', height='480')
+  script(src="javascripts/jquery-1.9.1.min.js")
+  script(src="javascripts/slider.js")
+  script(src="javascripts/tree.js")

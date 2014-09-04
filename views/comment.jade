@@ -1,0 +1,9 @@
+extends layout
+block body
+  h2 comments
+  fieldset
+    h2 #{weibo.user} #{weibo.date}
+    p= weibo.content
+    textarea(placeholder="wirte comments...")
+  ul(id="comment")
+    li hello
