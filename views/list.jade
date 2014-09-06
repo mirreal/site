@@ -1,36 +1,8 @@
-doctype html
-html
-  head
-    title ToDoList
-    link(rel='stylesheet', href='/stylesheets/list.css')
-  body
-    if (authenticated)
-      ul
-        li
-          a(id="user", href="/list/user/#{me.name}") #{me.name}
-        li
-          a(href="/list/logout") Logout
-        li(id="project") #{me.currentProject.name}
-      div(class="cleaner")
-      div(id="ele") Owers:
-        ul(id="owners")
-        input(id="addUser", type="text")
-        input(id="addUserButton", type="button", value="add User to this project")
-        
-    else
-      ul
-        li: a(href="/list/login") Login
-        li: a(href="/list/signup") Sign up
-        li Public Lists
-    div(class="cleaner")
-    hr
-    div(id="inputArea")
-      h2 ToDoLists
-      input(type="text", id="input", placeholder="Please input...")
-    ul(id="todolists")
-      div(class="cleaner")
-      hr
-    footer
-     p Copyright Mirreal's Notes 2014
+extend layout_list
+block body
+  div(id="inputArea")
+    h2 ToDoLists
+    input(type="text", id="input", placeholder="Please input...")
+  ul(id="todolists")
   script(src="/socket.io/socket.io.js")
   script(src="/javascripts/list.js")

@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html manifest="cache.appcache">
+  <head>
+    <meta charset="UTF-8">
+    <title>Fling in Canvas</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="fling.css">
+  </head>
+  <body>
+    <div id="container">
+      <div id="leftContainer">
+        <div id="GameIntro">
+          <h2>Fling in Canvas</h2>
+          <h3>Remove all balls(but one) to solve a puzzle</h3>
+          <p><a href="#" id="restartBtn" class="button">Restart</a></p>
+          <p><a href="#" id="undoBtn" class="button">Undo</a></p>
+          <h3>How to play?</h3>
+          <br>
+          <p>Use your <strong>mouse</strong> to select a ball. 
+            Then use your <strong>arrow keys</strong> to move the ball 
+            along a line into other balls.
+            Press <strong>R key</strong> or <strong>Undo Button</strong> to return last state.
+          </p>
+        </div>
+      </div>
+      <div id="rightContainer">
+        <header>
+          <h2>Fling in Canvas</h2>
+        </header>
+        <div id="gameComplete">
+          <div id="puzzleScore"> </div>
+          <br>
+          <input id="nextBtn" type="button" value="Next">
+        </div>
+        <div id="gameEnd">
+          <p id="scoreShow">score</p>
+          <input type="text" id="nameInput" placeholder="Input your name">
+          <input type="button" id="addBtn" value="Add my score" disabled="">
+          <input type="button" id="newGameBtn" value="New game">
+          <h3>TOP 7</h3>
+          <ol id="highScoreList"> </ol>
+        </div>
+        <canvas id="canvas" width="400" height="400">
+          Your browser does not support Canvas.
+        </canvas>
+      </div>
+    </div>
+
+    <script src="canvas.js"></script>
+    <script src="localData.js"></script>
+    <script src="eventHandler.js"></script>
+    <script src="HTMLManager.js"></script>
+    <script src="puzzles.js"></script>
+    <script src="fling.js"></script>
+  </body>
+</html>

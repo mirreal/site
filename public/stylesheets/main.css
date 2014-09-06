@@ -137,9 +137,11 @@ nav li a:hover {
   text-decoration: none;
   color: #00FF00;
   transition: all 0.6s ease-in 0.2s;
-  -webkit-transform: rotate(720deg);
-  -moz-transform: rotate(720deg);
-  transform: rotate(720deg);
+  /*
+   * -webkit-transform: rotate(720deg);
+   * -moz-transform: rotate(720deg);
+   * transform: rotate(720deg);
+   */
 }
 
 
