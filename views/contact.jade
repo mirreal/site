@@ -1,0 +1,44 @@
+extends layout
+block body
+  #content_wrapper
+    #content
+      #bubbles
+        .bubble.x1
+        .bubble.x2
+        .bubble.x3
+        .bubble.x4
+        .bubble.x5
+      .welcome
+        #thoreau
+          p I went to the woods becanse I wanted to live deliberately
+          p I wanted to live deep and suck out of all the marrow of life
+          p To put to rout all that was not life
+          p And not when I came to die, discove that I had not lived.
+        p  
+        p  
+        h2 May I Help you?
+        p  
+        p 请完成下面的表单提交消息
+        p  
+        p  
+        p Address： 成都市成华区二仙桥东三路
+        br
+        p Phone: 13688137432
+        br
+        p E-mail: exileduyi@gmail.com
+        p  
+        p  
+        form#test(action='', method='post')
+          p
+            label(for='name') Name: *
+            input#name(type='text', name='contact[name]', required='')
+          p
+            label(for='email') Email: *
+            input#email(type='email', name='contact[email]', required='')
+          p
+            label Message: 
+            textarea#message(name='contact[message]', rows='5', cols='20', required='')
+          p
+            label  
+            input#btncontact(type='submit', name='btsend', value='Submit')
+        p

@@ -509,7 +509,7 @@ input, textarea {
   height: 95px;
   margin:0 0 12px 0;
 }
-#btncontact, #btnreset {
+#btncontact {
   padding: 1px 10px;
   cursor: pointer;
   color: #FFF;

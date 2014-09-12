@@ -41,11 +41,20 @@ if ('development' == app.get('env')) {
 app.get('/', function(req, res) {
   res.render('index');
 });
+app.get('/contact', function(req, res) {
+  res.render('contact');
+});
 app.get('/login', function(req, res) {
   res.render('login');
 });
 app.get('/signup', function(req, res) {
   res.render('signup');
+});
+app.post('/contact', function(req, res, next) {
+  db.contact.insert(req.body.contact, function(err, doc) {
+    if (err) return next(err);
+    res.send('<p>Submit successfully.<a href="/">Go back</a></p>');
+  });
 });
 app.post('/signup', function(req, res, next) {
   db.users.findOne({name: req.body.user.name}, function(err, doc) {
