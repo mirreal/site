@@ -1,5 +1,4 @@
-$(document).ready(function()
-{
+$(document).ready(function() {
   var currentPosition = 0;
   var slideWidth = 750;
   var slides = $('.slide');
@@ -22,23 +21,23 @@ $(document).ready(function()
 
   manageControls(currentPosition);
 
-  $('.control')
-    .bind('click', function(){
-  currentPosition = ($(this).attr('id')=='rightControl') ? currentPosition+1 : currentPosition-1;
-    
+  $('.control').bind('click', function() {
+    var isRight = $(this).attr('id') === 'rightControl';
+    currentPosition += isRight ? 1 : -1;
+
     manageControls(currentPosition);
-    $('#slideInner').animate({
-      'marginLeft' : slideWidth*(-currentPosition)
-    });
+    $('#slideInner')
+      .animate({'marginLeft': slideWidth*(-currentPosition)+(isRight ? -92 : 92)})
+      .animate({'marginLeft': slideWidth*(-currentPosition)});
   });
 
-  function manageControls(position){
-    if(position == 0) {
+  function manageControls(position) {
+    if(position === 0) {
       $('#leftControl').hide();
     } else {
       $('#leftControl').show();
     }
-    if(position == numberOfSlides-1) {
+    if(position === numberOfSlides-1) {
       $('#rightControl').hide();
     } else {
       $('#rightControl').show();
