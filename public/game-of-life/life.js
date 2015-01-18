@@ -18,7 +18,7 @@ Game.prototype.init = function() {
   this.loop = setInterval(function() {
     self.update();
     self.draw();
-  }, 800);
+  }, 200);
 };
 
 Game.prototype.eventHandler = function() {
@@ -42,7 +42,7 @@ Game.prototype.eventHandler = function() {
       self.loop = setInterval(function() {
         self.update();
         self.draw();
-      }, 800);
+      }, 200);
       canvas.style.display = 'inline';
       snapshotImageElement.style.display = 'none';
       snapshotButton.innerHTML = 'Snapshot';
@@ -105,8 +105,6 @@ Game.prototype.update = function() {
     stone.aliveCount = 0;
   });
 }
-
-
 
 
 function Stone(position, status) {
