@@ -1,8 +1,8 @@
 var express = require('express');
 var http = require('http');
 var path = require('path');
-var db = require('./modules/database');
-var user = require('./modules/user');
+// var db = require('./modules/database');
+// var user = require('./modules/user');
 
 var app = express();
 var server = http.createServer(app);
@@ -188,11 +188,11 @@ app.get('/list/logout', function(req, res) {
 
 
 
-var io = require('socket.io').listen(server);
-var socketio = require('./socketio');
-socketio.list(io, db);
-socketio.weibo(io, db);
-socketio.user(io, db);
+// var io = require('socket.io').listen(server);
+// var socketio = require('./socketio');
+// socketio.list(io, db);
+// socketio.weibo(io, db);
+// socketio.user(io, db);
 
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
